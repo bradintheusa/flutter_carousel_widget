@@ -143,14 +143,19 @@ class NextPrevState extends StatefulWidget {
   State<NextPrevState> createState() => NextPrevStateState();
 }
 
+const weekDays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+
 class NextPrevStateState extends State<NextPrevState> {
   Future<String>? _value;
   final CarouselController _controller = CarouselController();
 
   Future<String> getValue() async {
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     return 'Flutter Devs';
   }
+
+  var current = 0;
 
   @override
   void initState() {
@@ -160,80 +165,98 @@ class NextPrevStateState extends State<NextPrevState> {
 
   @override
   Widget build(BuildContext context) {
-    int _current = 0;
-    return 
-    
-    Scaffold(
+    return Scaffold(
       appBar: AppBar(title: const Text('Image Slider Demo')),
-      body:
-    
-    
-    
-    Column(children: [
-      FutureBuilder<String>(
-          future: _value,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            if (snapshot.hasData) {
-              return Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: GestureDetector(
-                          onTap: _controller.previousPage,
-                          child: const Icon(
-                            Icons.chevron_left,
-                            size: 50,
-                            color: Colors.black,
+      body: Column(
+        children: [
+          FutureBuilder<String>(
+            future: _value,
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: GestureDetector(
+                            onTap: _controller.previousPage,
+                            child: Icon(
+                              Icons.chevron_left,
+                              size: 50,
+                              color: Colors.green.shade600,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
+                        Expanded(
                           child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                snapshot.data!,
-                              ))),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: GestureDetector(
-                          onTap: _controller.nextPage,
-                          child: const Icon(
-                            Icons.chevron_right,
-                            size: 50,
-                            color: Colors.black,
+                            alignment: Alignment.center,
+                            child: Text(
+                              snapshot.data!,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  FlutterCarousel(
-                    options: CarouselOptions(
-                        showIndicator: true,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: GestureDetector(
+                            onTap: _controller.nextPage,
+                            child: Icon(
+                              Icons.chevron_right,
+                              size: 50,
+                              color: Colors.green.shade600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    FlutterCarousel(
+                      carouselController: _controller,
+                      options: CarouselOptions(
                         autoPlay: false,
-                        slideIndicator: CircularSlideIndicator(),
+                        showIndicator: false,
                         onPageChanged: (index, reason) {
                           setState(() {
-                            _current = index;
+                            current = index;
                           });
-                        }),
-                    items: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-                        .map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Text(i);
                         },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              );
-            }
-            return Text('Loading');
-          })
-    ]));
+                      ),
+                      items: weekDays.map((i) {
+                        return Builder(
+                          builder: (BuildContext ctx) {
+                            return Text(i);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: weekDays.map((i) {
+                        final idx = weekDays.indexOf(i);
+                        return Container(
+                          height: 10,
+                          width: 10,
+                          margin: const EdgeInsets.symmetric(horizontal: 2.0),
+                          decoration: BoxDecoration(
+                            color: current == idx
+                                ? Colors.green.shade600
+                                : Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  ],
+                );
+              }
+              return const Center(child: Text('Loading'));
+            },
+          )
+        ],
+      ),
+    );
   }
 }
+
 
